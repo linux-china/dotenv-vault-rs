@@ -1,7 +1,7 @@
 use super::errors::{Error, Result};
-use super::log::{info, warn};
 
 use std::{env, path::PathBuf};
+use log::{info, warn, error};
 
 /// Vault data
 pub struct Vault {
@@ -61,21 +61,17 @@ impl Vault {
     /// regular .env file.
     fn find(&self) -> Result<Option<Vec<u8>>> {
         if self.key.is_none() {
-            if !cfg!(debug_assertions) {
-                warn("You are using dotenv-vault in a production environment, but you haven't set DOTENV_KEY. Did you forget? Run 'npx dotenv-vault keys' to view your DOTENV_KEY.");
-            }
+            warn!("You are using dotenv-vault in a production environment, but you haven't set DOTENV_KEY. Did you forget? Run 'npx dotenv-vault keys' to view your DOTENV_KEY.");
             return Ok(None);
         }
 
         if self.path.as_ref().map_or(false, |path| path.exists()) {
-            if cfg!(debug_assertions) {
-                info("Loading env from encrypted .env.vault");
-            }
+            info!("Loading env from encrypted .env.vault");
             let vault = self.parse()?;
             return Ok(Some(vault));
         }
 
-        warn("You set a DOTENV_KEY but you are missing a .env.vault file. Did you forget to build it? Run 'npx dotenv-vault build'.");
+        warn!("You set a DOTENV_KEY but you are missing a .env.vault file. Did you forget to build it? Run 'npx dotenv-vault build'.");
         Ok(None)
     }
 
@@ -324,7 +320,7 @@ mod tests {
 
         let vault = Vault {
             key: Some("dotenv://:key_ddcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=development".into()),
-            path: Some(vault_path)
+            path: Some(vault_path),
         };
         let parsed = vault.parse();
 
@@ -333,7 +329,7 @@ mod tests {
             parsed.unwrap(),
             vec![
                 35, 32, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110, 116, 64, 118, 54, 10, 65,
-                76, 80, 72, 65, 61, 34, 122, 101, 116, 97, 34
+                76, 80, 72, 65, 61, 34, 122, 101, 116, 97, 34,
             ]
         );
 
@@ -352,7 +348,7 @@ mod tests {
 
         let vault = Vault {
             key: Some("dotenv://:key_ddcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=development".into()),
-            path: Some(vault_path)
+            path: Some(vault_path),
         };
         let parsed = vault.parse();
 
@@ -374,7 +370,7 @@ mod tests {
 
         let vault = Vault {
             key: Some("dotenv://:key_ddcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=development".into()),
-            path: Some(vault_path)
+            path: Some(vault_path),
         };
         let parsed = vault.parse();
 
@@ -396,7 +392,7 @@ mod tests {
 
         let vault = Vault {
             key: Some("dotenv://:key_XXcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=development,dotenv://:key_ddcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=production".into()),
-            path: Some(vault_path)
+            path: Some(vault_path),
         };
         let parsed = vault.parse();
 
@@ -405,7 +401,7 @@ mod tests {
             parsed.unwrap(),
             vec![
                 35, 32, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110, 116, 64, 118, 54, 10, 65,
-                76, 80, 72, 65, 61, 34, 122, 101, 116, 97, 34
+                76, 80, 72, 65, 61, 34, 122, 101, 116, 97, 34,
             ]
         );
 
@@ -424,7 +420,7 @@ mod tests {
 
         let vault = Vault {
             key: Some("dotenv://:key_XXcaa26504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=development,dotenv://:key_XXYY6504cd70a6fef9801901c3981538563a1767c297cb8416e8a38c62fe00@dotenv.local/vault/.env.vault?environment=production".into()),
-            path: Some(vault_path)
+            path: Some(vault_path),
         };
         let parsed = vault.parse();
 
