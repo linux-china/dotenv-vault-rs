@@ -1,7 +1,7 @@
 use super::errors::{Error, Result};
 
 use std::{env, path::PathBuf};
-use log::{info, warn, error};
+use crate::log::{info,warn};
 
 /// Vault data
 pub struct Vault {
@@ -61,17 +61,17 @@ impl Vault {
     /// regular .env file.
     fn find(&self) -> Result<Option<Vec<u8>>> {
         if self.key.is_none() {
-            warn!("You are using dotenv-vault in a production environment, but you haven't set DOTENV_KEY. Did you forget? Run 'npx dotenv-vault keys' to view your DOTENV_KEY.");
+            warn("You are using dotenv-vault in a production environment, but you haven't set DOTENV_KEY. Did you forget? Run 'npx dotenv-vault keys' to view your DOTENV_KEY.");
             return Ok(None);
         }
 
         if self.path.as_ref().map_or(false, |path| path.exists()) {
-            info!("Loading env from encrypted .env.vault");
+            info("Loading env from encrypted .env.vault");
             let vault = self.parse()?;
             return Ok(Some(vault));
         }
 
-        warn!("You set a DOTENV_KEY but you are missing a .env.vault file. Did you forget to build it? Run 'npx dotenv-vault build'.");
+        warn("You set a DOTENV_KEY but you are missing a .env.vault file. Did you forget to build it? Run 'npx dotenv-vault build'.");
         Ok(None)
     }
 

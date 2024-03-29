@@ -1,21 +1,18 @@
 use std::fmt::Display;
+use log::{log, Level};
 
-/// Macro for generating logging functions
-macro_rules! log_fn {
-    ($name:tt, $level:tt) => {
-        pub fn $name<T>(message: T)
-        where
-            T: Display,
-        {
-            println!(
-                "[dotenv-vault@{}][{}] {}",
-                env!("CARGO_PKG_VERSION"),
-                $level,
-                message
-            );
-        }
-    };
+pub fn warn<T>(message: T) where T: Display {
+    log!(Level::Warn,
+        "[dotenv-vault@{}][Warn] {}",
+        env!("CARGO_PKG_VERSION"),
+        message
+    );
 }
 
-log_fn!(info, "INFO");
-log_fn!(warn, "WARN");
+pub fn info<T>(message: T) where T: Display {
+    log!(Level::Info,
+        "[dotenv-vault@{}][Info] {}",
+        env!("CARGO_PKG_VERSION"),
+        message
+    );
+}
