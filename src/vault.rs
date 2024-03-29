@@ -68,7 +68,9 @@ impl Vault {
         }
 
         if self.path.as_ref().map_or(false, |path| path.exists()) {
-            info("Loading env from encrypted .env.vault");
+            if cfg!(debug_assertions) {
+                info("Loading env from encrypted .env.vault");
+            }
             let vault = self.parse()?;
             return Ok(Some(vault));
         }
