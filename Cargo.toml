@@ -1,6 +1,6 @@
 [package]
 name = "dotenv-vault"
-version = "0.1.1"
+version = "0.1.2"
 description = "An extension to dotenvy supporting .env.vault files"
 homepage = "https://github.com/Minebomber/dotenv-vault-rs"
 repository = "https://github.com/Minebomber/dotenv-vault-rs"
@@ -9,15 +9,28 @@ keywords = ["dotenv", "env", "environment", "settings", "vault"]
 categories = ["config"]
 license = "MIT"
 edition = "2021"
+rust-version = "1.73.0"
+
+[[bin]]
+name = "dotenv-vault"
+required-features = ["cli"]
+
+[lib]
+
+[features]
+default = []
+cli = ["dep:argh"]
 
 [dependencies]
-aes-gcm = "0.10"
-base64 = "0.22"
+aes-gcm = "0.10.2"
+argh = { version = "0.1.12", optional = true }
+base64 = "0.22.1"
 dotenvy = "0.15.7"
 hex = "0.4.3"
 url = "2.5.0"
 log = "0.4"
 
 [dev-dependencies]
-serial_test = "3.0.0"
-tempfile = "3.10"
+serial_test = "3.1.1"
+tempfile = "3.10.1"
+assert_cmd = { version = "2.0.14", features = ["color-auto"] }

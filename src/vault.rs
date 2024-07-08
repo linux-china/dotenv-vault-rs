@@ -151,26 +151,24 @@ impl Vault {
         };
 
         for key in keys.split(',') {
-            match self
+            if let Ok(decrypted) = self
                 .instructions(key)
                 .and_then(|(k, e)| {
                     let vault = dotenvy::from_path_iter(path)?;
-                    let ciphertext = match vault.into_iter().find(|item| match item {
+                    let maybe_ciphertext = vault.into_iter().find(|item| match item {
                         Ok((k, _)) => k == &e,
                         _ => false,
-                    }) {
+                    });
+                    let ciphertext = match maybe_ciphertext {
                         Some(Ok((_, c))) => c,
-                        _ => {
-                            return Err(Error::EnvironmentNotFound(e));
-                        }
+                        _ => return Err(Error::EnvironmentNotFound(e)),
                     };
 
                     Ok((ciphertext, k))
                 })
                 .and_then(|(c, k)| self.decrypt(c, k))
             {
-                Ok(decrypted) => return Ok(decrypted),
-                Err(_) => continue,
+                return Ok(decrypted);
             }
         }
 
@@ -200,9 +198,8 @@ mod tests {
     #[test]
     fn instructions_ok() {
         let vault = Vault::new();
-        let instructions = vault.instructions(
-            "dotenv://:key_1234@dotenv.org/vault/.env.vault?environment=production".into(),
-        );
+        let instructions = vault
+            .instructions("dotenv://:key_1234@dotenv.org/vault/.env.vault?environment=production");
 
         assert!(instructions.is_ok());
         let (key, environment) = instructions.unwrap();
@@ -213,8 +210,8 @@ mod tests {
     #[test]
     fn instructions_invalid_scheme() {
         let vault = Vault::new();
-        let instructions = vault
-            .instructions("invalid://dotenv.org/vault/.env.vault?environment=production".into());
+        let instructions =
+            vault.instructions("invalid://dotenv.org/vault/.env.vault?environment=production");
 
         assert!(instructions.is_err());
         assert!(matches!(instructions.unwrap_err(), Error::InvalidScheme));
@@ -223,8 +220,8 @@ mod tests {
     #[test]
     fn instructions_missing_key() {
         let vault = Vault::new();
-        let instructions = vault
-            .instructions("dotenv://dotenv.org/vault/.env.vault?environment=production".into());
+        let instructions =
+            vault.instructions("dotenv://dotenv.org/vault/.env.vault?environment=production");
 
         assert!(instructions.is_err());
         assert!(matches!(instructions.unwrap_err(), Error::MissingKey));
@@ -233,8 +230,7 @@ mod tests {
     #[test]
     fn instructions_missing_environment() {
         let vault = Vault::new();
-        let instructions =
-            vault.instructions("dotenv://:key_1234@dotenv.org/vault/.env.vault".into());
+        let instructions = vault.instructions("dotenv://:key_1234@dotenv.org/vault/.env.vault");
 
         assert!(instructions.is_err());
         assert!(matches!(
