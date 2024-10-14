@@ -22,15 +22,15 @@ default = []
 cli = ["dep:argh"]
 
 [dependencies]
-aes-gcm = "0.10.2"
+aes-gcm = "0.10.3"
 argh = { version = "0.1.12", optional = true }
 base64 = "0.22.1"
 dotenvy = "0.15.7"
 hex = "0.4.3"
-url = "2.5.0"
+url = "2.5.2"
 log = "0.4"
 
 [dev-dependencies]
 serial_test = "3.1.1"
-tempfile = "3.10.1"
-assert_cmd = { version = "2.0.14", features = ["color-auto"] }
+tempfile = "3.13.0"
+assert_cmd = { version = "2.0.16", features = ["color-auto"] }
