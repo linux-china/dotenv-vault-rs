@@ -31,5 +31,5 @@ log = "0.4"
 
 [dev-dependencies]
 serial_test = "3.2.0"
-tempfile = "3.19.1"
+tempfile = "3.20"
 assert_cmd = { version = "2.0.17", features = ["color-auto"] }
